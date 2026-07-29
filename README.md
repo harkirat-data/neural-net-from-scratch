@@ -11,7 +11,10 @@ Predicting a continuous value (LPA from CGPA and profile score).
 - See [Regression_Problems/README.md](./Regression_Problems/README.md) for details on the from-scratch implementation.
 
 ### `Classification_Problems/`
-In progress — same from-scratch vs framework structure, applied to a classification task.
+Binary classification (predicting placement from CGPA and profile score).
+- `model-from-scratch.ipynb` — manual NumPy implementation
+- `model-with-libraries.ipynb` — Keras implementation
+- See [Classification_Problems/README.md](./Classification_Problems/README.md) for details on the from-scratch implementation.
 
 ## Stack
 
