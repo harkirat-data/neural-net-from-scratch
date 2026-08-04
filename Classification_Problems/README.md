@@ -1,62 +1,188 @@
-# Neural Network From Scratch (NumPy) — Classification
+# Neural Network from Scratch for Binary Classification
 
-A feedforward neural network built entirely from scratch in NumPy — no PyTorch, no TensorFlow, no autograd. Same approach as the regression project: derive the math by hand and implement every step explicitly.
+A complete implementation of a feedforward neural network for binary classification using only **NumPy**, followed by an equivalent implementation using **TensorFlow/Keras** to verify the correctness of the manually implemented forward propagation, backpropagation, and optimization process.
 
-**Architecture:** 2 input features → 2-neuron hidden layer → 1 output neuron, with **sigmoid activation applied at every layer** (a real difference from the regression version, which was fully linear).
-**Problem type:** Binary classification — predicting placement (0/1) from CGPA and profile score.
+The repository demonstrates every mathematical operation involved in training a neural network—from weight initialization to gradient computation—without relying on any deep learning framework for the primary implementation.
 
-## Dataset
-
-| CGPA | Profile Score | Placed |
-|-----:|--------------:|-------:|
-| 8 | 8 | 1 |
-| 7 | 9 | 1 |
-| 6 | 10 | 0 |
-| 5 | 5 | 0 |
-
-Same small, hand-traceable format as the regression dataset, with a binary label instead of a continuous one.
-
-## What's implemented
-
-**Parameter initialization** — same generalized `initialize_parameters` function used in the regression project, works for any `layer_dims`.
-
-**Forward propagation with sigmoid** — `linear_forward` now applies `sigmoid(Z)` after the linear step at every layer, so the network's output is bounded between 0 and 1, as required for binary classification. `L_layer_forward` chains this across layers.
-
-**Loss function** — binary cross-entropy (`-y·log(ŷ) - (1-y)·log(1-ŷ)`), printed per sample and averaged per epoch, replacing the mean squared error used in the regression version.
-
-**Gradient derivation and weight updates** — partial derivatives were hand-derived for this architecture and hardcoded in `update_parameters`, the same approach as the regression project.
-
-**Training loop** — same structure as the regression version: 50 epochs, one row at a time, tracking mean loss per epoch.
-
-## Limitations
-
-- The gradient formulas in `update_parameters` appear to carry over the same chain-rule structure used for the (fully linear) regression model, without an explicit term for the hidden layer's sigmoid derivative — worth double-checking against the correct binary cross-entropy + sigmoid gradient before relying on this for anything beyond the toy dataset.
-- Training loss barely moves across all 50 epochs (stays close to 0.693, which is `ln(2)` — the loss a model gets by predicting 0.5 for everything). On this dataset the model isn't learning to separate the classes yet.
-- Same architecture-specific limitation as the regression project: the update rules are hardcoded for this exact 2→2→1 shape, not a generalized backward pass.
-- No train/test split, batching, or learning rate scheduling.
-
-## Sample output
-
-```
-Epoch 1  Loss - 0.6941
-Epoch 25 Loss - 0.6942
-Epoch 50 Loss - 0.6943
-```
-
-## Stack
-
-Python, NumPy, pandas
+The project concludes with **Gradient Checking**, where the manually derived gradients are compared against TensorFlow's automatic differentiation (`GradientTape`) to validate the implementation.
 
 ---
 
-# Keras Implementation (`model-with-libraries.ipynb`)
+# Project Workflow
 
-Same classification problem, same dataset, same 2→2→1 architecture with sigmoid activations — built with Keras for direct comparison against the from-scratch version above.
+```mermaid
+flowchart LR
 
-**Architecture:** `Sequential` model with two `Dense` layers, both using sigmoid activation, matching the from-scratch model's structure exactly.
+A[Generate Synthetic Dataset]
+--> B[Neural Network from Scratch]
 
-**Weight initialization** — Keras's default weights were manually overridden (`model.set_weights`) with the same starting values (0.1) used in the from-scratch model, so both models begin training from an identical point.
+B
+--> C[Forward Propagation]
 
-**Training** — compiled with the Adam optimizer (learning rate 0.001) and binary cross-entropy loss, trained for 50 epochs with a batch size of 1, matching the from-scratch training loop exactly.
+C
+--> D[Binary Cross Entropy Loss]
 
-**Result** — loss also stays close to 0.693 across all 50 epochs, consistent with the from-scratch model. Both implementations show the same plateau, which suggests the flat loss is a property of this dataset/setup (likely too few samples and epochs for the model to move away from the random baseline) rather than an error unique to one implementation.
+D
+--> E[Backpropagation]
+
+E
+--> F[Gradient Descent]
+
+F
+--> G[Training]
+
+G
+--> H[TensorFlow/Keras Implementation]
+
+H
+--> I[Gradient Checking]
+
+I
+--> J[Validated Backpropagation]
+```
+
+---
+
+# Project Overview
+
+This project was built to understand **how neural networks actually learn**, rather than treating deep learning frameworks as black boxes.
+
+Instead of using a single function such as `model.fit()`, every stage of the learning process has been implemented manually using **NumPy**, including:
+
+- Weight Initialization
+- Bias Initialization
+- Forward Propagation
+- Sigmoid Activation
+- Binary Cross Entropy (BCE) Loss
+- Backpropagation
+- Gradient Descent Parameter Updates
+
+After completing the manual implementation, the same neural network architecture is recreated using **TensorFlow/Keras**.
+
+The gradients produced by TensorFlow's automatic differentiation engine (`GradientTape`) are then compared against the manually derived gradients. Matching gradients confirm that the implemented backpropagation algorithm is mathematically correct.
+
+This repository is designed for anyone who wants to understand the mathematics behind neural networks rather than simply using existing deep learning libraries.
+
+---
+
+# Repository Structure
+
+```text
+Classification_Problems/
+
+│── model-from-scratch.ipynb
+│     Complete implementation using NumPy
+
+│── model-with-libraries.ipynb
+│     Equivalent implementation using TensorFlow/Keras
+
+│── Gradient-Check.ipynb
+│     Manual gradients vs TensorFlow GradientTape
+
+│── README.md
+```
+
+---
+
+# Features
+
+- Neural Network implemented entirely from scratch using NumPy
+- Manual Forward Propagation
+- Manual Binary Cross Entropy Loss
+- Manual Backpropagation
+- Manual Gradient Descent
+- TensorFlow/Keras implementation for verification
+- Gradient Checking using TensorFlow GradientTape
+- Synthetic binary classification dataset
+- Standardized input features
+- Fully documented mathematical derivations
+
+---
+
+# Neural Network Architecture
+
+The network implemented throughout this project is a fully connected feedforward neural network consisting of:
+
+- **Input Layer:** 2 Features (`f1`, `f2`)
+- **Hidden Layer:** 2 Neurons (Sigmoid Activation)
+- **Output Layer:** 1 Neuron (Sigmoid Activation)
+
+The output neuron predicts the probability of belonging to the positive class.
+
+```mermaid
+graph LR
+
+F1[f1]
+F2[f2]
+
+H1((Hidden Neuron 1))
+H2((Hidden Neuron 2))
+
+O((Class))
+
+F1 --> H1
+F1 --> H2
+
+F2 --> H1
+F2 --> H2
+
+H1 --> O
+H2 --> O
+```
+
+---
+
+### Input Features
+
+| Feature | Description |
+|----------|-------------|
+| **f1** | Input Feature 1 |
+| **f2** | Input Feature 2 |
+
+---
+
+### Output
+
+| Output | Description |
+|---------|-------------|
+| **Class** | Binary prediction (0 or 1) |
+
+The network receives two numerical input features (`f1` and `f2`) and predicts the probability that the sample belongs to the positive class.
+
+During inference,
+
+- Probability ≥ 0.5 → Class = **1**
+- Probability < 0.5 → Class = **0**
+
+---
+
+## Learning Pipeline
+
+The complete learning pipeline implemented in this repository is illustrated below.
+
+```mermaid
+flowchart TD
+
+A[Input Features]
+--> B[Weighted Sum]
+
+B
+--> C[Sigmoid Activation]
+
+C
+--> D[Prediction]
+
+D
+--> E[Binary Cross Entropy Loss]
+
+E
+--> F[Backpropagation]
+
+F
+--> G[Gradient Descent]
+
+G
+--> H[Updated Parameters]
+```
+
+Every block shown above has been implemented manually in the NumPy version before being verified using TensorFlow.
